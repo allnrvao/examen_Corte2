@@ -13,12 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.DataRepository
+import ni.edu.uam.administracion.modelo.Vuelo
 
 @Composable
-fun AdministrarVuelosScreen(onVerPasajeros: (Int) -> Unit, onDone: () -> Unit) {
+fun AdministrarVuelosScreen(vuelos: MutableList<Vuelo>, onVerPasajeros: (Int) -> Unit, onDone: () -> Unit) {
     var refrescar by remember { mutableStateOf(0) }
-    val vuelos = DataRepository.cola.DarLista()
 
     Column(
         modifier = Modifier
@@ -54,7 +53,7 @@ fun AdministrarVuelosScreen(onVerPasajeros: (Int) -> Unit, onDone: () -> Unit) {
                 )
             ) {
                 Text(
-                    text = "No hay vuelos en la cola",
+                    text = "No hay vuelos",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -99,12 +98,7 @@ fun AdministrarVuelosScreen(onVerPasajeros: (Int) -> Unit, onDone: () -> Unit) {
 
                                 ElevatedButton(
                                     onClick = {
-                                        // intentar desencolar si tiene pasajeros
-                                        val removed = DataRepository.cola.desencolar()
-                                        if (!removed) {
-                                            // si no se pudo, intentar remover por índice
-                                            vuelos.removeAt(index)
-                                        }
+                                        vuelos.removeAt(index)
                                         refrescar++
                                     },
                                     modifier = Modifier.weight(1f),
@@ -115,11 +109,11 @@ fun AdministrarVuelosScreen(onVerPasajeros: (Int) -> Unit, onDone: () -> Unit) {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
-                                        contentDescription = "Eliminar/Desencolar",
+                                        contentDescription = "Eliminar",
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Eliminar/Desencolar")
+                                    Text("Eliminar")
                                 }
                             }
                         }

@@ -12,12 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.DataRepository
+import ni.edu.uam.administracion.modelo.Vuelo
 
 @Composable
-fun AdministrarPasajerosScreen(vueloIndex: Int, onDone: () -> Unit) {
+fun AdministrarPasajerosScreen(vuelos: MutableList<Vuelo>, vueloIndex: Int, onDone: () -> Unit) {
     var refrescar by remember { mutableStateOf(0) }
-    val vuelos = DataRepository.cola.DarLista()
 
     Column(
         modifier = Modifier

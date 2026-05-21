@@ -10,20 +10,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.DataRepository
 import ni.edu.uam.administracion.modelo.Pasajero
 import androidx.compose.material3.MenuAnchorType
+import ni.edu.uam.administracion.modelo.Vuelo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrearPasajeroScreen(onDone: () -> Unit, onAdministrarPasajeros: (Int) -> Unit) {
+fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdministrarPasajeros: (Int) -> Unit) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var edadStr by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
 
     // seleccionar vuelo
-    val vuelos = DataRepository.cola.DarLista()
     var selectedIndex by remember { mutableStateOf(if (vuelos.isNotEmpty()) 0 else -1) }
     var expanded by remember { mutableStateOf(false) }
 

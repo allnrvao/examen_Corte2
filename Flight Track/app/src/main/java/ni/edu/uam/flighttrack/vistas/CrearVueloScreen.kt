@@ -9,11 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.DataRepository
 import ni.edu.uam.administracion.modelo.Vuelo
 
 @Composable
-fun CrearVueloScreen(onDone: () -> Unit) {
+fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
     var numero by remember { mutableStateOf("") }
     var aerolinea by remember { mutableStateOf("") }
     var destino by remember { mutableStateOf("") }
@@ -82,8 +81,8 @@ fun CrearVueloScreen(onDone: () -> Unit) {
                             if (destino.isBlank()) Vuelo.destinosDisponibles.first() else destino,
                             if (tipo.isBlank()) Vuelo.tiposDeViaje.first() else tipo
                         )
-                        DataRepository.cola.encolar(vuelo)
-                        mensaje = "Vuelo creado y encolado"
+                        vuelos.add(vuelo)
+                        mensaje = "Vuelo creado"
                         // limpiar
                         numero = ""; aerolinea = ""; destino = ""; tipo = ""
                     } else {
