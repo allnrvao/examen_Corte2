@@ -1,49 +1,46 @@
 package ni.edu.uam.flighttrack
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ni.edu.uam.flighttrack.vistas.*
-import ni.edu.uam.administracion.modelo.Vuelo
+import ni.edu.uam.flighttrack.viewmodel.VuelosViewModel
+import ni.edu.uam.flighttrack.viewmodel.ClientesViewModel
 
 @Composable
 fun Navegacion() {
     val navController = rememberNavController()
-    val vuelos = remember { mutableStateListOf<Vuelo>() }
+    val vuelosViewModel: VuelosViewModel = viewModel()
+    val clientesViewModel: ClientesViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(navController)
         }
         composable("crearVuelo") {
-            CrearVueloScreen(vuelos = vuelos, onDone = { navController.popBackStack() })
+            CrearVueloScreen(
+                vuelosViewModel = vuelosViewModel,
+                clientesViewModel = clientesViewModel,
+                onDone = { navController.popBackStack() }
+            )
         }
-        composable("crearPasajero") {
-            CrearPasajeroScreen(
-                vuelos = vuelos,
-                onDone = { navController.popBackStack() },
-                onAdministrarPasajeros = { vueloIndex ->
-                    navController.navigate("administrarPasajeros/$vueloIndex")
-                }
+        composable("crearCliente") {
+            CrearClienteScreen(
+                clientesViewModel = clientesViewModel,
+                onDone = { navController.popBackStack() }
             )
         }
         composable("administrarVuelos") {
             AdministrarVuelosScreen(
-                vuelos = vuelos,
-                onVerPasajeros = { vueloIndex ->
-                    navController.navigate("administrarPasajeros/$vueloIndex")
-                },
+                vuelosViewModel = vuelosViewModel,
                 onDone = { navController.popBackStack() }
             )
         }
-        composable("administrarPasajeros/{vueloIndex}") { backStackEntry ->
-            val vueloIndex = backStackEntry.arguments?.getString("vueloIndex")?.toIntOrNull() ?: -1
-            AdministrarPasajerosScreen(
-                vuelos = vuelos,
-                vueloIndex = vueloIndex,
+        composable("administrarClientes") {
+            AdministrarClientesScreen(
+                clientesViewModel = clientesViewModel,
                 onDone = { navController.popBackStack() }
             )
         }

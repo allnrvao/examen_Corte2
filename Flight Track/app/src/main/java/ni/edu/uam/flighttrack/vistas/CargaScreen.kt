@@ -1,47 +1,53 @@
 package ni.edu.uam.flighttrack.vistas
 
-import androidx.compose.runtime.Composable
-import kotlinx.coroutines.delay
-
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
-// Asegúrate de importar el R de tu proyecto para acceder al logo
-// import ni.edu.uam.administracion.R
-internal class {
-    @Composable
-    fun CargaScreen(): @Composable `fun`?
-    fun LaunchedEffect() {
-        delay(2500) // Un poco más de tiempo para que se aprecie la barra
+@Composable
+fun CargaScreen(onLoadingFinished: () -> Unit) {
+    LaunchedEffect(Unit) {
+        delay(2500)
         onLoadingFinished()
     }
 
-    // Usamos Box para el fondo azul oscuro como el del logo
-    fun Box(
-    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Flight Track",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
 
-    fun background()
-    fun Column(
-    )
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(4.dp)
+            )
 
-    // Logo de la aplicación
-    // Recuerda guardar tu imagen en res/drawable con un nombre simple (ej: app_logo.png)
-    fun Image(
-    )
-
-    fun size()
-    fun Spacer()
-
-    // Barra de carga horizontal
-    fun LinearProgressIndicator(
-    )
-
-    fun height()
-    fun copy()
-    fun Spacer()
-    fun Text(
-    )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Cargando...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
 }

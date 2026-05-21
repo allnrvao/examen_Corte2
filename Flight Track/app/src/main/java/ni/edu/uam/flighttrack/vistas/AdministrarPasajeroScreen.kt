@@ -1,23 +1,18 @@
-package ni.edu.uam.flighttrack.vistas;
-
+package ni.edu.uam.flighttrack.vistas
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.Vuelo
 
 @Composable
-fun AdministrarPasajerosScreen(vuelos: MutableList<Vuelo>, vueloIndex: Int, onDone: () -> Unit) {
-    var refrescar by remember { mutableStateOf(0) }
-
+fun AdministrarPasajerosScreen(
+    onDone: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,87 +33,30 @@ fun AdministrarPasajerosScreen(vuelos: MutableList<Vuelo>, vueloIndex: Int, onDo
             Text("Volver")
         }
 
-        if (vuelos.isEmpty() || vueloIndex < 0 || vueloIndex >= vuelos.size) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-            ) {
-                Text(
-                    text = "Vuelo no encontrado",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-            return@Column
-        }
-
-        val vuelo = vuelos[vueloIndex]
         Text(
-            text = "Pasajeros del vuelo ${vuelo.getNumeroVuelo()}",
+            text = "Información de Pasajeros",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        val pasajeros = vuelo.DarListaPasajeros()
-        if (pasajeros.isEmpty()) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "No hay pasajeros",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    text = "Gestión de Pasajeros",
+                    style = MaterialTheme.typography.titleMedium
                 )
-            }
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                itemsIndexed(pasajeros) { index, pasajero ->
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = pasajero.DarDatosPasajero(),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            }
-
-                            ElevatedButton(
-                                onClick = {
-                                    vuelo.EliminarPasajero(pasajero)
-                                    refrescar++
-                                },
-                                colors = ButtonDefaults.elevatedButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Delete,
-                                    contentDescription = "Eliminar",
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Eliminar")
-                            }
-                        }
-                    }
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "La gestión de pasajeros se realiza a través de la API. Consulta el backend para más información sobre los pasajeros asociados a cada vuelo.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

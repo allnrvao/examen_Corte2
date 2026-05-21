@@ -1,42 +1,60 @@
 package ni.edu.uam.flighttrack.vistas
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.Pasajero
 import androidx.compose.material3.MenuAnchorType
-import ni.edu.uam.administracion.modelo.Vuelo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdministrarPasajeros: (Int) -> Unit) {
+fun CrearPasajeroScreen(
+    onDone: () -> Unit
+) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var edadStr by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
 
-    // seleccionar vuelo
-    var selectedIndex by remember { mutableStateOf(if (vuelos.isNotEmpty()) 0 else -1) }
-    var expanded by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        OutlinedButton(
+            onClick = onDone,
+            modifier = Modifier.padding(bottom = 16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Volver",
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Volver")
+        }
+
         Text(
-            text = "Crear Pasajero",
+            text = "Información de Pasajero",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Text(
+            text = "Esta funcionalidad es de referencia. Los pasajeros se crean como parte de la información del vuelo.",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(bottom = 24.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         OutlinedTextField(
@@ -66,39 +84,6 @@ fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdmini
                 .padding(bottom = 24.dp)
         )
 
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        ) {
-            OutlinedTextField(
-                value = if (selectedIndex >= 0 && vuelos.size > selectedIndex) vuelos[selectedIndex].getNumeroVuelo() else "Seleccione un vuelo",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Vuelo") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                vuelos.forEachIndexed { index, vuelo ->
-                    DropdownMenuItem(
-                        text = { Text(vuelo.getNumeroVuelo()) },
-                        onClick = {
-                            selectedIndex = index
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -111,39 +96,20 @@ fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdmini
                         return@ElevatedButton
                     }
 
-                    if (selectedIndex < 0 || selectedIndex >= vuelos.size) {
-                        mensaje = "Seleccione un vuelo"
-                        return@ElevatedButton
-                    }
-
-                    val pasajero = Pasajero(nombre, apellido, edad)
-                    vuelos[selectedIndex].AgregarPasajero(pasajero)
-                    mensaje = "Pasajero agregado al vuelo ${vuelos[selectedIndex].getNumeroVuelo()}"
-                    // limpiar
-                    nombre = ""; apellido = ""; edadStr = ""
+                    mensaje = "Datos de pasajero: $nombre $apellido ($edad años)"
+                    nombre = ""
+                    apellido = ""
+                    edadStr = ""
                 },
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
-                    imageVector = Icons.Filled.PersonAdd,
-                    contentDescription = "Agregar Pasajero",
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "Guardar",
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Agregar Pasajero")
-            }
-
-            OutlinedButton(
-                onClick = onDone,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Volver")
+                Text("Guardar Datos")
             }
         }
 
@@ -152,7 +118,7 @@ fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdmini
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (mensaje.contains("agregado")) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
                 Text(
@@ -160,23 +126,6 @@ fun CrearPasajeroScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit, onAdmini
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
-            }
-        }
-
-        // Botón rápido para ir a administrar pasajeros del vuelo seleccionado
-        if (selectedIndex >= 0) {
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedButton(
-                onClick = { onAdministrarPasajeros(selectedIndex) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Administrar Pasajeros",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Administrar pasajeros del vuelo seleccionado")
             }
         }
     }

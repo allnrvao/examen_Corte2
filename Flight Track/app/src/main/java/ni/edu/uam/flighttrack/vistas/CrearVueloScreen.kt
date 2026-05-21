@@ -1,6 +1,8 @@
 package ni.edu.uam.flighttrack.vistas
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -9,23 +11,60 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import ni.edu.uam.administracion.modelo.Vuelo
+import ni.edu.uam.flighttrack.viewmodel.VuelosViewModel
+import ni.edu.uam.flighttrack.viewmodel.ClientesViewModel
+import androidx.compose.material3.MenuAnchorType
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
-    var numero by remember { mutableStateOf("") }
-    var aerolinea by remember { mutableStateOf("") }
+fun CrearVueloScreen(
+    vuelosViewModel: VuelosViewModel,
+    clientesViewModel: ClientesViewModel,
+    onDone: () -> Unit
+) {
+    var codigo by remember { mutableStateOf("") }
+    var origen by remember { mutableStateOf("") }
     var destino by remember { mutableStateOf("") }
-    var tipo by remember { mutableStateOf("") }
+    var salida by remember { mutableStateOf("") }
+    var llegada by remember { mutableStateOf("") }
+    var asientosStr by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
+
+    var clienteExpandido by remember { mutableStateOf(false) }
+    var clienteSeleccionado by remember { mutableStateOf<Int>(-1) }
+
+    val isLoading by vuelosViewModel.isLoading.collectAsState()
+    val errorMessage by vuelosViewModel.errorMessage.collectAsState()
+    val clientes by clientesViewModel.clientes.collectAsState()
+
+    LaunchedEffect(errorMessage) {
+        if (errorMessage.isNotEmpty()) {
+            mensaje = errorMessage
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        OutlinedButton(
+            onClick = onDone,
+            modifier = Modifier.padding(bottom = 16.dp),
+            enabled = !isLoading
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Volver",
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Volver")
+        }
+
         Text(
             text = "Crear Vuelo",
             style = MaterialTheme.typography.headlineMedium,
@@ -33,21 +72,23 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
         )
 
         OutlinedTextField(
-            value = numero,
-            onValueChange = { numero = it },
-            label = { Text("Número de vuelo") },
+            value = codigo,
+            onValueChange = { codigo = it },
+            label = { Text("Código de vuelo") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
         )
 
         OutlinedTextField(
-            value = aerolinea,
-            onValueChange = { aerolinea = it },
-            label = { Text("Aerolínea") },
+            value = origen,
+            onValueChange = { origen = it },
+            label = { Text("Origen") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
         )
 
         OutlinedTextField(
@@ -56,17 +97,75 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
             label = { Text("Destino") },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
         )
 
         OutlinedTextField(
-            value = tipo,
-            onValueChange = { tipo = it },
-            label = { Text("Tipo de viaje") },
+            value = salida,
+            onValueChange = { salida = it },
+            label = { Text("Hora de salida") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
+        )
+
+        OutlinedTextField(
+            value = llegada,
+            onValueChange = { llegada = it },
+            label = { Text("Hora de llegada") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
+        )
+
+        OutlinedTextField(
+            value = asientosStr,
+            onValueChange = { asientosStr = it },
+            label = { Text("Asientos disponibles") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            enabled = !isLoading
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = clienteExpandido,
+            onExpandedChange = { clienteExpandido = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp)
-        )
+        ) {
+            OutlinedTextField(
+                value = if (clienteSeleccionado >= 0 && clientes.size > clienteSeleccionado) 
+                    "${clientes[clienteSeleccionado].nombres} ${clientes[clienteSeleccionado].apellidos}" 
+                    else "Seleccione un cliente",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Cliente") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = clienteExpandido) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                enabled = !isLoading
+            )
+            ExposedDropdownMenu(
+                expanded = clienteExpandido,
+                onDismissRequest = { clienteExpandido = false }
+            ) {
+                clientes.forEachIndexed { index, cliente ->
+                    DropdownMenuItem(
+                        text = { Text("${cliente.nombres} ${cliente.apellidos}") },
+                        onClick = {
+                            clienteSeleccionado = index
+                            clienteExpandido = false
+                        }
+                    )
+                }
+            }
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -74,22 +173,33 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
         ) {
             ElevatedButton(
                 onClick = {
-                    if (numero.isNotBlank()) {
-                        val vuelo = Vuelo(
-                            numero,
-                            if (aerolinea.isBlank()) Vuelo.aerolineasDisponibles.first() else aerolinea,
-                            if (destino.isBlank()) Vuelo.destinosDisponibles.first() else destino,
-                            if (tipo.isBlank()) Vuelo.tiposDeViaje.first() else tipo
+                    if (codigo.isNotBlank() && origen.isNotBlank() && destino.isNotBlank() && 
+                        salida.isNotBlank() && llegada.isNotBlank() && asientosStr.isNotBlank() &&
+                        clienteSeleccionado >= 0) {
+                        val asientos = asientosStr.toIntOrNull() ?: 0
+                        vuelosViewModel.createVuelo(
+                            cliente = clientes[clienteSeleccionado],
+                            codigo = codigo,
+                            origen = origen,
+                            destino = destino,
+                            salida = salida,
+                            llegada = llegada,
+                            asientosDisponibles = asientos
                         )
-                        vuelos.add(vuelo)
-                        mensaje = "Vuelo creado"
-                        // limpiar
-                        numero = ""; aerolinea = ""; destino = ""; tipo = ""
+                        mensaje = "Vuelo creado exitosamente"
+                        codigo = ""
+                        origen = ""
+                        destino = ""
+                        salida = ""
+                        llegada = ""
+                        asientosStr = ""
+                        clienteSeleccionado = -1
                     } else {
-                        mensaje = "Ingrese número de vuelo"
+                        mensaje = "Complete todos los campos y seleccione un cliente"
                     }
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                enabled = !isLoading
             ) {
                 Icon(
                     imageVector = Icons.Filled.Check,
@@ -99,19 +209,6 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Crear Vuelo")
             }
-
-            OutlinedButton(
-                onClick = onDone,
-                modifier = Modifier.weight(1f)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Volver")
-            }
         }
 
         if (mensaje.isNotEmpty()) {
@@ -119,7 +216,7 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (mensaje.contains("creado")) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+                    containerColor = if (errorMessage.isEmpty()) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
                 )
             ) {
                 Text(
@@ -128,6 +225,11 @@ fun CrearVueloScreen(vuelos: MutableList<Vuelo>, onDone: () -> Unit) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        }
+
+        if (isLoading) {
+            Spacer(modifier = Modifier.height(16.dp))
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
     }
 }

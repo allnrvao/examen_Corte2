@@ -16,22 +16,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AdministracionTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     // Llamada a la navegación composable; pasamos el padding interno
                     Box(modifier = Modifier.padding(innerPadding)) {
                         Navegacion()
                     }
-                }
+
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppPreview() {
-    AdministracionTheme {
-        Navegacion()
     }
 }
