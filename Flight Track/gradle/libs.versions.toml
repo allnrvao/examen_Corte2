@@ -31,6 +31,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 retrofit = {module= "com.squareup.retrofit2:retrofit", version.ref = "converterGson"}
 androidx-benchmark-common = { group = "androidx.benchmark", name = "benchmark-common", version.ref = "benchmarkCommon" }
+desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version = "2.0.3" }
 
 
 [plugins]

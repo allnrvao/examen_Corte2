@@ -25,6 +25,21 @@ fun CrearClienteScreen(
 
     val isLoading by clientesViewModel.isLoading.collectAsState()
     val errorMessage by clientesViewModel.errorMessage.collectAsState()
+    val clientes by clientesViewModel.clientes.collectAsState()
+
+    // Para navegar de regreso solo después de que el cliente haya sido agregado
+    var awaitingNavigation by remember { mutableStateOf(false) }
+    var prevClientesCount by remember { mutableStateOf(clientes.size) }
+
+    LaunchedEffect(clientes) {
+        if (awaitingNavigation) {
+            if (clientes.size > prevClientesCount) {
+                awaitingNavigation = false
+                onDone()
+            }
+        }
+        prevClientesCount = clientes.size
+    }
 
     LaunchedEffect(errorMessage) {
         if (errorMessage.isNotEmpty()) {
@@ -116,6 +131,9 @@ fun CrearClienteScreen(
             ElevatedButton(
                 onClick = {
                     if (nombres.isNotBlank() && apellidos.isNotBlank() && email.isNotBlank() && telefono.isNotBlank() && documento.isNotBlank()) {
+                        // Guardar conteo actual y esperar a que ViewModel agregue el cliente
+                        prevClientesCount = clientes.size
+                        awaitingNavigation = true
                         clientesViewModel.createCliente(
                             nombres = nombres,
                             apellidos = apellidos,
@@ -123,7 +141,8 @@ fun CrearClienteScreen(
                             telefono = telefono,
                             documento = documento
                         )
-                        mensaje = "Cliente creado exitosamente"
+                        mensaje = "Creando cliente..."
+                        // Limpiar campos
                         nombres = ""
                         apellidos = ""
                         email = ""

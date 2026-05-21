@@ -12,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ni.edu.uam.flighttrack.viewmodel.VuelosViewModel
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun AdministrarVuelosScreen(
@@ -97,6 +100,22 @@ fun AdministrarVuelosScreen(
                         Column(
                             modifier = Modifier.padding(16.dp)
                         ) {
+                            // Parsear fechas para mostrar en formato legible
+                            val parseFormatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm")
+                            val displayFormatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
+                            val salidaDisplay = try {
+                                val d: Date = parseFormatter.parse(vuelo.salida)
+                                displayFormatter.format(d)
+                            } catch (e: ParseException) {
+                                vuelo.salida
+                            }
+                            val llegadaDisplay = try {
+                                val d: Date = parseFormatter.parse(vuelo.llegada)
+                                displayFormatter.format(d)
+                            } catch (e: ParseException) {
+                                vuelo.llegada
+                            }
+
                             Text(
                                 text = "Vuelo: ${vuelo.codigo}",
                                 style = MaterialTheme.typography.titleMedium
@@ -115,11 +134,11 @@ fun AdministrarVuelosScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             
                             Text(
-                                text = "Salida: ${vuelo.salida}",
+                                text = "Salida: $salidaDisplay",
                                 style = MaterialTheme.typography.bodySmall
                             )
                             Text(
-                                text = "Llegada: ${vuelo.llegada}",
+                                text = "Llegada: $llegadaDisplay",
                                 style = MaterialTheme.typography.bodySmall
                             )
                             

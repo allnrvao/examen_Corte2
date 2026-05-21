@@ -44,7 +44,7 @@ class VuelosViewModel : ViewModel() {
             _errorMessage.value = ""
             try {
                 val nuevoVuelo = Vuelos(
-                    id = 0,
+                    id = null,
                     codigo = codigo,
                     origen = origen,
                     destino = destino,
