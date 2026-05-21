@@ -1,4 +1,7 @@
 package ni.edu.uam.registroVuelos_API.Repository;
 
-public interface ClienteRepository {
+import ni.edu.uam.registroVuelos_API.Models.Cliente;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 }
